@@ -10,32 +10,21 @@ jobs:
   sonarscan:
     runs-on: ubuntu-latest
     steps:
-      - name: 拉取代码
+      - name: 拉取完整代码
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # 必须，用于SonarQube识别代码变更
 
-      - name: 设置 JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'gradle'  # 新增Gradle缓存，彻底解决依赖问题
-
-      - name: 生成Gradle Wrapper并赋予权限
-        run: |
-          gradle wrapper
-          chmod +x ./gradlew
-
-      - name: 编译项目（跳过测试）
-        run: ./gradlew clean build -x test --no-daemon
-
-      - name: 执行 SonarQube 扫描
+      - name: SonarQube 官方扫描（零依赖，无需Gradle）
+        uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: ./gradlew sonarqube \
-          -Dsonar.projectKey=mi-notes-sonar \
-          -Dsonar.projectName="小米便签开源源版" \
-          -Dsonar.sources=app/src/main/java \
-          --no-daemon
+        with:
+          projectBaseDir: .  # 项目根目录
+          args: >
+            -Dsonar.projectKey=mi-notes-sonar
+            -Dsonar.projectName="小米便签开源源版"
+            -Dsonar.sources=app/src/main/java
+            -Dsonar.java.binaries=app/build/intermediates/javac/debug/classes
+            -Dsonar.exclusions=**/.gradle/**,**/build/**
