@@ -10,7 +10,8 @@ jobs:
   sonarscan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: 拉取代码
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0  # 必须，用于SonarQube识别代码变更
 
@@ -20,8 +21,16 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 赋予 Gradle 执行权限
-        run: chmod +x ./gradlew
+      - name: 配置 Gradle 缓存（大幅加速构建）
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
+      - name: 赋予 Gradle 执行权限（兼容异常场景，避免报错）
+        run: |
+          if [ -f ./gradlew ]; then
+            chmod +x ./gradlew
+          fi
 
       - name: 编译项目（跳过测试）
         run: ./gradlew clean build -x test
@@ -30,9 +39,4 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: ./gradlew sonarqube \
-          -Dsonar.projectKey=mi-notes-sonar \
-          -Dsonar.projectName="小米便签开源版" \
-          -Dsonar.sources=app/src/main/java \
-          -Dsonar.exclusions="**/build/**,**/test/**,**/libs/**,**/res/**" \
-          -Dsonar.java.source=8
+        run: ./gradlew sonar
