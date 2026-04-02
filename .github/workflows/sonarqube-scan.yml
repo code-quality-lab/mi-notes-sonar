@@ -20,15 +20,15 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'gradle'  # 新增Gradle缓存，彻底解决依赖问题
 
-      - name: 自动生成Gradle Wrapper（彻底解决gradlew缺失问题）
-        run: gradle wrapper
-
-      - name: 赋予 Gradle 执行权限（自动兼容）
-        run: chmod +x ./gradlew
+      - name: 生成Gradle Wrapper并赋予权限
+        run: |
+          gradle wrapper
+          chmod +x ./gradlew
 
       - name: 编译项目（跳过测试）
-        run: ./gradlew clean build -x test
+        run: ./gradlew clean build -x test --no-daemon
 
       - name: 执行 SonarQube 扫描
         env:
@@ -37,4 +37,5 @@ jobs:
         run: ./gradlew sonarqube \
           -Dsonar.projectKey=mi-notes-sonar \
           -Dsonar.projectName="小米便签开源源版" \
-          -Dsonar.sources=app/src/main/java
+          -Dsonar.sources=app/src/main/java \
+          --no-daemon
