@@ -1,5 +1,4 @@
 name: SonarQube 代码质量扫描
-
 on:
   push:
     branches: [ main ]
@@ -10,12 +9,13 @@ jobs:
   sonarscan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: 拉取完整代码
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
-      - name: SonarQube 扫描
-        uses: SonarSource/sonarqube-scan-action@master
+
+      - name: SonarQube 官方扫描（最简配置）
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
