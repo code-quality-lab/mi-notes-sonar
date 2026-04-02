@@ -13,16 +13,16 @@ jobs:
       - name: 拉取完整代码
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 必须，用于SonarQube识别代码变更
+          fetch-depth: 0
 
-      - name: SonarQube 扫描（最新官方版，无漏洞兼容）
+      - name: SonarQube 扫描
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  # 这里填 https://sonarcloud.io/
         with:
           args: >
-            -Dsonar.projectKey=mi-notes-sonar
-            -Dsonar.projectName="小米便签开源源版"
+            -Dsonar.projectKey=code-quality-lab_mi-notes-sonar
+            -Dsonar.organization=code-quality-lab
             -Dsonar.sources=app/src/main/java
             -Dsonar.exclusions=**/.gradle/**,**/build/**,**/test/**
