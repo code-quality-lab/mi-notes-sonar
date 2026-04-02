@@ -15,16 +15,14 @@ jobs:
         with:
           fetch-depth: 0  # 必须，用于SonarQube识别代码变更
 
-      - name: SonarQube 官方扫描（零依赖，无需Gradle）
-        uses: SonarSource/sonarqube-scan-action@v5
+      - name: SonarQube 扫描（最新官方版，无漏洞兼容）
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         with:
-          projectBaseDir: .  # 项目根目录
           args: >
             -Dsonar.projectKey=mi-notes-sonar
             -Dsonar.projectName="小米便签开源源版"
             -Dsonar.sources=app/src/main/java
-            -Dsonar.java.binaries=app/build/intermediates/javac/debug/classes
-            -Dsonar.exclusions=**/.gradle/**,**/build/**
+            -Dsonar.exclusions=**/.gradle/**,**/build/**,**/test/**
