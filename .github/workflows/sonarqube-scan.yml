@@ -21,16 +21,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 配置 Gradle 缓存（大幅加速构建）
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: false
+      - name: 自动生成Gradle Wrapper（彻底解决gradlew缺失问题）
+        run: gradle wrapper
 
-      - name: 赋予 Gradle 执行权限（兼容异常场景，避免报错）
-        run: |
-          if [ -f ./gradlew ]; then
-            chmod +x ./gradlew
-          fi
+      - name: 赋予 Gradle 执行权限（自动兼容）
+        run: chmod +x ./gradlew
 
       - name: 编译项目（跳过测试）
         run: ./gradlew clean build -x test
@@ -39,4 +34,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: ./gradlew sonar
+        run: ./gradlew sonarqube \
+          -Dsonar.projectKey=mi-notes-sonar \
+          -Dsonar.projectName="小米便签开源源版" \
+          -Dsonar.sources=app/src/main/java
